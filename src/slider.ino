@@ -5,6 +5,7 @@
 // #include <WebSocketsClient.h>
 // #include <WiFiUdp.h>
 // #include <SimpleTimer.h>
+#include <TaskScheduler.h>
 #include <JsonParser.h>
 #include <PID_v1.h>
 #include "ram.h"
@@ -21,8 +22,8 @@ void setup() {
 
     delay(2000);
     Serial.begin(115200);
-    sendSerial("\n");                       // seperate the rubbish
-    sendSerial("\n");                       // seperate the rubbish
+    Serial.print("\n");                       // seperate the rubbish
+    Serial.print("\n");                       // seperate the rubbish
     debugmln("* SDK:" + String(ESP.getSdkVersion()));
     debugmln("* getBootVersion:" + String(ESP.getBootVersion()));
     debugmln("* getBootMode:" + String(ESP.getBootMode()));
@@ -71,6 +72,6 @@ void uartClear() {
 }
 
 //------------------------------------------------------
-void sendSerial(String str) {
-    Serial.print(str);
+void Callback1() {
+    debugmln("HI");
 }

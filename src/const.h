@@ -27,3 +27,5 @@
 #define LED_TCP1	D4
 #define LED_TCP2	D3
 #define LED_TCP3	D2
+
+void Callback1();
