@@ -20,7 +20,6 @@ void setup() {
     pinMode(LED_TCP2, OUTPUT);
     pinMode(LED_TCP3, OUTPUT);
 
-    delay(2000);
     Serial.begin(115200);
     Serial.print("\n");                       // seperate the rubbish
     Serial.print("\n");                       // seperate the rubbish
@@ -35,7 +34,10 @@ void setup() {
     debugmln("* getFlashChipMode:" + String(ESP.getFlashChipMode()));
     debugmln("* getFlashChipSize:" + String(ESP.getFlashChipSize()));
     debugmln("* start");
+    delay(100);
+
     ESP.wdtEnable(WDTO_1S);
+    t1.restartDelayed();
 }
 
 //------------------------------------------------------

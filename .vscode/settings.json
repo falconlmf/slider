@@ -18,11 +18,10 @@
     "editor.formatOnType": false,
     "editor.formatOnPaste": false,
     "telemetry.enableTelemetry": false,
+    "C_Cpp.errorSquiggles": "Disabled",
     "C_Cpp.clang_format_formatOnSave": false,
     "editor.fontLigatures": true,
     "editor.fontWeight": "100",
     "clang-format.style": "LLVM",
-    "clang-format.executable": "clang-format",
-    "C_Cpp.errorSquiggles": "Disabled",
-    "C_Cpp.intelliSenseEngineFallback": "Disabled"
+    "clang-format.executable": "clang-format"
 }
