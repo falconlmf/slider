@@ -7,7 +7,7 @@
     "window.zoomLevel": 0,
     "window.menuBarVisibility": "default",
     "editor.fontSize": 13,
-    // "editor.fontSize": 12,
+    // "editor.fontSize": 12.5,
     // "editor.fontFamily": "Fira Code",
     "files.autoSave": "afterDelay",
     "workbench.colorTheme": "Flatland Monokai",
@@ -20,8 +20,9 @@
     "telemetry.enableTelemetry": false,
     "C_Cpp.errorSquiggles": "Disabled",
     "C_Cpp.clang_format_formatOnSave": false,
+    "C_Cpp.formatting" : "Disabled",
     "editor.fontLigatures": true,
     "editor.fontWeight": "100",
-    "clang-format.style": "LLVM",
+    "clang-format.style": "{ BasedOnStyle: LLVM, IndentWidth: 4 }",
     "clang-format.executable": "clang-format"
-}
+    }
