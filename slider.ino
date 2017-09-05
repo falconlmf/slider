@@ -16,7 +16,7 @@ MotorClass::MotorClass(double _input, double _output, double _setPoint, double _
     analogWrite(P_FWD, 0);
     analogWrite(P_BWD, 0);
     analogWriteRange(65535);
-    pid.SetMode(AUTOMATIC);
+    pid.SetMode(MANUAL);
     pid.SetSampleTime(10);
     pid.SetOutputLimits(-65535, 65535);
     attachInterrupt(P_A, sliderISR, CHANGE);

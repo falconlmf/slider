@@ -47,7 +47,7 @@ public:
     void set(int i);
 };
 
-MotorClass slider(0, 0, 0, 2400, 150, 500, D5, D6, D1, D2);
+MotorClass slider(0, 0, 0, 3000, 1800, 100, D5, D6, D1, D2);
 
 //------------------------------------------------------
 struct uartStruct {
@@ -61,7 +61,37 @@ struct uartStruct {
 
     void run() {
         if(UART.available()) {
-            slider.set(UART.parseInt());
+            char c = UART.read();
+            float f;
+            switch(c) {
+            case 'p': 
+                f = UART.parseFloat();
+                if(f) {
+                    slider.kp = f;
+                    slider.pid.SetTunings(slider.kp, slider.ki, slider.kd);
+                }
+                de.pid("kp:"+String(slider.kp));
+                break;
+            case 'i':
+                f = UART.parseFloat();
+                if(f) {
+                    slider.ki = f;
+                    slider.pid.SetTunings(slider.kp, slider.ki, slider.kd);
+                }
+                de.pid("ki:"+String(slider.ki));
+                break;
+            case 'd':
+                f = UART.parseFloat();
+                if(f) {
+                    slider.kd = f;
+                    slider.pid.SetTunings(slider.kp, slider.ki, slider.kd);
+                }
+                de.pid("kd:"+String(slider.kd));
+                break;
+            case 'q':
+                slider.set((int)UART.parseInt());
+                break;
+            }
             return;
 
             uartBuf[uartPtr] = (char)UART.read();
