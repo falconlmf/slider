@@ -15,19 +15,20 @@ MotorClass::MotorClass(double _input, double _output, double _setPoint, double _
     pinMode(P_B, INPUT);
     analogWrite(P_FWD, 0);
     analogWrite(P_BWD, 0);
-    analogWriteRange(1000);
+    analogWriteRange(65535);
     pid.SetMode(AUTOMATIC);
     pid.SetSampleTime(10);
-    pid.SetOutputLimits(-1000, 1000);
+    pid.SetOutputLimits(-65535, 65535);
     attachInterrupt(P_A, sliderISR, CHANGE);
 }
 
 void MotorClass::run() {
     pid.Compute();
 
-    if(output == 0 || (abs(input - setPoint)) < 5) {
-        analogWrite(P_FWD, 0);
-        analogWrite(P_BWD, 0);
+    if(output == 0) {
+        output = 0;
+    } else if(((abs(input - setPoint)) < 5) && (pid.GetMode() == AUTOMATIC)) {
+        tPIDsteady.once_ms(1500, pidCallback);
     } else if(output > 0) {
         analogWrite(P_FWD, output);
         analogWrite(P_BWD, 0);
@@ -35,6 +36,11 @@ void MotorClass::run() {
         analogWrite(P_FWD, 0);
         analogWrite(P_BWD, abs(output));
     }
+}
+
+void MotorClass::set(int i) {
+    setPoint = i;
+    pid.SetMode(AUTOMATIC);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -48,7 +54,24 @@ void sliderISR() {
 
 void Callback1() {
     de.pid(String(slider.input) + " " + String(slider.output) + " " + String(slider.setPoint));
-    t1.restartDelayed();
+    // t1.restartDelayed();
+}
+
+void pidCallback() {
+    pid.SetMode(MANUAL);
+    analogWrite(P_FWD, 0);
+    analogWrite(P_BWD, 0);
+}
+
+void udp_runner() {
+    char buf[10];
+
+    byte i = udpServer.parsePacket();
+    if(i) {
+        udpServer.read(buf, 10);
+        slider.set(buf[2] * 3);
+        de.udp("udp");
+    }
 }
 
 void jsonControl(char *json, byte jsonLen) {
@@ -63,11 +86,24 @@ void jsonControl(char *json, byte jsonLen) {
     }
 }
 
+char *str2char(String str) {
+    if(str.length() != 0) {
+        char *p = const_cast<char *>(str.c_str());
+        return p;
+    }
+}
+
 //----------------------------------------------------------------------------------------------------
 void setup() {
     Serial.begin(115200);
     Serial.print("\n"); // seperate the rubbish
     Serial.print("\n"); // seperate the rubbish
+    ESP.wdtEnable(WDTO_1S);
+    WiFi.softAP(str2char(".."), str2char("........"), 1, true);
+    delay(1000);
+    udpServer.begin(1111);
+    t1.attach_ms(250, Callback1);
+
     de.mcu("SDK:" + String(ESP.getSdkVersion()));
     de.mcu("getBootVersion:" + String(ESP.getBootVersion()));
     de.mcu("getBootMode:" + String(ESP.getBootMode()));
@@ -79,13 +115,13 @@ void setup() {
     de.mcu("getFlashChipMode:" + String(ESP.getFlashChipMode()));
     de.mcu("getFlashChipSize:" + String(ESP.getFlashChipSize()));
     de.mcu("start");
-
-    ESP.wdtEnable(WDTO_1S);
 }
 
 void loop() {
     ESP.wdtFeed();
-    ts.execute();
+    // ts.execute();
     uart.run();
     slider.run();
+
+    udp_runner();
 }
