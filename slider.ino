@@ -25,10 +25,21 @@ MotorClass::MotorClass(double _input, double _output, double _setPoint, double _
 void MotorClass::run() {
     pid.Compute();
 
+    if(pid.GetMode() == AUTOMATIC) {
+        if(abs(setPoint - input) <= 5) {
+            if(!stopping) {
+                tSteady.once(2, sliderSteadyCB);
+                stopping = true;
+            }
+        } else {
+            tSteady.detach();
+            stopping = false;
+        }
+    }
+
     if(output == 0) {
-        output = 0;
-    } else if(((abs(input - setPoint)) < 5) && (pid.GetMode() == AUTOMATIC)) {
-        tPIDsteady.once_ms(1500, pidCallback);
+        analogWrite(P_FWD, 0);
+        analogWrite(P_BWD, 0);
     } else if(output > 0) {
         analogWrite(P_FWD, output);
         analogWrite(P_BWD, 0);
@@ -54,13 +65,14 @@ void sliderISR() {
 
 void Callback1() {
     de.pid(String(slider.input) + " " + String(slider.output) + " " + String(slider.setPoint));
-    // t1.restartDelayed();
 }
 
-void pidCallback() {
-    pid.SetMode(MANUAL);
+void sliderSteadyCB() {
+    slider.pid.SetMode(MANUAL);
+    slider.output = 0;
     analogWrite(P_FWD, 0);
     analogWrite(P_BWD, 0);
+    de.pid("CB");
 }
 
 void udp_runner() {
@@ -102,7 +114,7 @@ void setup() {
     WiFi.softAP(str2char(".."), str2char("........"), 1, true);
     delay(1000);
     udpServer.begin(1111);
-    t1.attach_ms(250, Callback1);
+    tLog.attach_ms(250, Callback1);
 
     de.mcu("SDK:" + String(ESP.getSdkVersion()));
     de.mcu("getBootVersion:" + String(ESP.getBootVersion()));
@@ -119,7 +131,6 @@ void setup() {
 
 void loop() {
     ESP.wdtFeed();
-    // ts.execute();
     uart.run();
     slider.run();
 

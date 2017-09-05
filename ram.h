@@ -9,6 +9,7 @@
 #define _RAM_H_
 
 WiFiUDP udpServer;
+Ticker tLog;
 
 struct debugStruct {
     void mcu(String str) {
@@ -25,12 +26,6 @@ struct debugStruct {
 debugStruct de;
 
 //------------------------------------------------------
-Ticker t1, tPIDsteady;
-// Scheduler ts;
-// Task t1(250, TASK_ONCE, &Callback1, &ts, true);
-
-//------------------------------------------------------
-
 class MotorClass {
 public:
     // general
@@ -41,6 +36,10 @@ public:
     double kp = 0, ki = 0, kd = 0;
     PID pid;
 
+    // Ticker
+    bool stopping;
+    Ticker tSteady;
+
     MotorClass(double _input, double _output, double _setPoint, double _kp,
                double _ki, double _kd, byte _P_FWD, byte _P_BWD, byte _P_A,
                byte _P_B);
@@ -48,7 +47,7 @@ public:
     void set(int i);
 };
 
-MotorClass slider(0, 0, 0, 2000, 240000, 500, D5, D6, D7, D8);
+MotorClass slider(0, 0, 0, 2400, 150, 500, D5, D6, D1, D2);
 
 //------------------------------------------------------
 struct uartStruct {

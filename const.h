@@ -13,6 +13,7 @@
 void jsonControl(char *json, byte jsonLen);
 void sliderISR();
 void Callback1();
+void sliderSteadyCB();
 
 #define P_FWD D5
 #define P_BWD D6
